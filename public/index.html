@@ -56,11 +56,41 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            position: relative;
         }
         
-        .platform-card:hover {
+        /* Особенная карточка BOTMASTER */
+        .platform-card.botmaster-card {
+            border: 2px solid #6752E9;
+            box-shadow: 0 6px 25px rgba(103, 82, 233, 0.25);
+            transform: translateY(-5px);
+            background: linear-gradient(145deg, #ffffff, #f9f8ff);
+        }
+        
+        .platform-card.botmaster-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 35px rgba(103, 82, 233, 0.35);
+        }
+        
+        /* Обычные карточки */
+        .platform-card:not(.botmaster-card):hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+        
+        /* Бейдж для BOTMASTER */
+        .badge {
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            background: linear-gradient(45deg, #6752E9, #8B7AFF);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 3px 10px rgba(103, 82, 233, 0.3);
+            z-index: 1;
         }
         
         .logo-container {
@@ -76,8 +106,9 @@
         }
         
         .botmaster-logo-container {
-            background-color: #6752E9;
-            border: 1px solid #5543c7;
+            background: linear-gradient(135deg, #6752E9, #8B7AFF);
+            border: 2px solid #5543c7;
+            box-shadow: 0 5px 15px rgba(103, 82, 233, 0.2);
         }
         
         .watbot-logo-container {
@@ -103,6 +134,14 @@
             color: #303133;
         }
         
+        .botmaster-name {
+            background: linear-gradient(45deg, #6752E9, #8B7AFF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+        
         .show-prices-btn {
             padding: 12px 24px;
             color: white;
@@ -111,17 +150,20 @@
             font-size: 16px;
             font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.3s;
             width: 100%;
             margin-top: auto;
         }
         
         .botmaster-btn {
-            background-color: #6752E9;
+            background: linear-gradient(45deg, #6752E9, #8B7AFF);
+            box-shadow: 0 4px 15px rgba(103, 82, 233, 0.3);
         }
         
         .botmaster-btn:hover {
-            background-color: #5543c7;
+            background: linear-gradient(45deg, #5543c7, #7565e5);
+            box-shadow: 0 6px 20px rgba(103, 82, 233, 0.4);
+            transform: translateY(-2px);
         }
         
         .watbot-btn {
@@ -186,6 +228,10 @@
             font-weight: 600;
             color: #303133;
             margin: 0;
+        }
+        
+        .botmaster-dialog-title {
+            color: #6752E9;
         }
         
         .close-btn {
@@ -283,6 +329,7 @@
         
         .botmaster-price {
             color: #6752E9;
+            font-weight: 700;
         }
         
         .watbot-price {
@@ -331,6 +378,14 @@
                 min-width: 100%;
                 max-width: 100%;
                 padding: 25px;
+            }
+            
+            .platform-card.botmaster-card {
+                transform: translateY(0);
+            }
+            
+            .platform-card.botmaster-card:hover {
+                transform: translateY(-3px);
             }
             
             .logo-container {
@@ -389,6 +444,13 @@
                 padding: 8px;
             }
             
+            .badge {
+                top: -10px;
+                right: -10px;
+                padding: 4px 10px;
+                font-size: 11px;
+            }
+            
             .platform-name {
                 font-size: 20px;
             }
@@ -426,12 +488,13 @@
     
     <div class="platforms-container">
         <!-- Карточка BOTMASTER -->
-        <div class="platform-card" id="botmasterCard">
+        <div class="platform-card botmaster-card" id="botmasterCard">
+            <div class="badge">НАША ПЛАТФОРМА</div>
             <div class="logo-container botmaster-logo-container">
                 <img src="logo/botmaster.png" alt="BOTMASTER Logo" class="platform-logo" id="botmasterLogo">
             </div>
-            <h2 class="platform-name">BOTMASTER</h2>
-            <button class="show-prices-btn botmaster-btn" id="openBotmasterBtn">Показать наши цены</button>
+            <h2 class="platform-name botmaster-name">BOTMASTER</h2>
+            <button class="show-prices-btn botmaster-btn" id="openBotmasterBtn">Показать цены</button>
         </div>
         
         <!-- Карточка Watbot -->
@@ -440,7 +503,7 @@
                 <img src="logo/watbot.png" alt="Watbot Logo" class="platform-logo" id="watbotLogo">
             </div>
             <h2 class="platform-name">Watbot</h2>
-            <button class="show-prices-btn watbot-btn" id="openWatbotBtn">Показать цены Watbot</button>
+            <button class="show-prices-btn watbot-btn" id="openWatbotBtn">Показать цены</button>
         </div>
         
         <!-- Карточка LEADTEX -->
@@ -449,7 +512,7 @@
                 <img src="logo/leadtex.png" alt="LEADTEX Logo" class="platform-logo" id="leadtexLogo">
             </div>
             <h2 class="platform-name">LEADTEX</h2>
-            <button class="show-prices-btn leadtex-btn" id="openLeadtexBtn">Показать цены LEADTEX</button>
+            <button class="show-prices-btn leadtex-btn" id="openLeadtexBtn">Показать цены</button>
         </div>
     </div>
     
@@ -671,14 +734,17 @@
         function openDialog(platform) {
             if (platform === 'botmaster') {
                 dialogTitle.textContent = 'Цены BOTMASTER';
+                dialogTitle.classList.add('botmaster-dialog-title');
                 fillPriceTable(botmasterPrices, 'botmaster');
                 alertText.textContent = 'Цена зависит от количества контактов в вашем боте и подключенных дополнительных опций. Удаленные контакты также считаются, но только в одном учетном периоде.';
             } else if (platform === 'watbot') {
                 dialogTitle.textContent = 'Цены Watbot';
+                dialogTitle.classList.remove('botmaster-dialog-title');
                 fillPriceTable(watbotPrices, 'watbot');
                 alertText.textContent = 'Цена зависит от количества контактов во всех ваших ботах и подключенных дополнительных опций. Удаленные контакты также считаются, но только в одном учетном периоде.';
             } else {
                 dialogTitle.textContent = 'Цены LEADTEX';
+                dialogTitle.classList.remove('botmaster-dialog-title');
                 fillPriceTable(leadtexPrices, 'leadtex');
                 alertText.textContent = 'Цена зависит от количества контактов во всех ваших ботах и подключенных дополнительных опций. Удаленные контакты также считаются, но только в одном учетном периоде.';
             }
