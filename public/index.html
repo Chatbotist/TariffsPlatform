@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сравнение цен - Watbot vs LEADTEX</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Open Sans', 'Roboto', sans-serif;
+            line-height: 1.5;
+            background-color: #f6f6f6;
+            color: #000;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #303133;
+            font-size: 28px;
+        }
+        
+        .platforms-container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        .platform-card {
+            flex: 1;
+            min-width: 300px;
+            max-width: 350px;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid #e5e7ee;
+        }
+        
+        .platform-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+        
+        .platform-logo {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        
+        .watbot-logo {
+            background-color: #0054e9;
+            color: white;
+        }
+        
+        .leadtex-logo {
+            background-color: #4caf50;
+            color: white;
+        }
+        
+        .platform-name {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #303133;
+        }
+        
+        .platform-description {
+            color: #606266;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .show-prices-btn {
+            padding: 12px 24px;
+            background-color: #0054e9;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            width: 100%;
+        }
+        
+        .watbot-btn {
+            background-color: #0054e9;
+        }
+        
+        .watbot-btn:hover {
+            background-color: #004acd;
+        }
+        
+        .leadtex-btn {
+            background-color: #4caf50;
+        }
+        
+        .leadtex-btn:hover {
+            background-color: #3d8b40;
+        }
+        
+        /* Стили для диалога */
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        
+        .dialog-overlay.active {
+            display: flex;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Стили для заголовка диалога */
+        .dialog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #e5e7ee;
+            background-color: #fafafa;
+        }
+        
+        .dialog-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #303133;
+            margin: 0;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #909399;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+            line-height: 1;
+        }
+        
+        .close-btn:hover {
+            background-color: #f5f5f5;
+            color: #606266;
+        }
+        
+        /* Стили для информационного блока */
+        .alert {
+            display: flex;
+            align-items: flex-start;
+            padding: 16px;
+            margin: 20px;
+            border-radius: 8px;
+            background-color: #f4f4f5;
+            border: 1px solid #e9e9eb;
+            color: #909399;
+        }
+        
+        .alert-icon {
+            flex-shrink: 0;
+            margin-right: 12px;
+            font-size: 20px;
+            color: #909399;
+        }
+        
+        .alert-content {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .alert-title {
+            color: #606266;
+            font-weight: 500;
+        }
+        
+        /* Стили для таблицы */
+        .dialog-body {
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .price-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 0 20px 0;
+        }
+        
+        .price-table thead {
+            background-color: #fafafa;
+            position: sticky;
+            top: 0;
+        }
+        
+        .price-table th {
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #303133;
+            border-bottom: 2px solid #ebeef5;
+        }
+        
+        .price-table td {
+            padding: 16px;
+            border-bottom: 1px solid #ebeef5;
+            color: #606266;
+        }
+        
+        .price-table tr:hover {
+            background-color: #f5f7fa;
+        }
+        
+        .contacts-col {
+            width: 60%;
+            font-weight: 500;
+        }
+        
+        .price-col {
+            width: 40%;
+            font-weight: 600;
+        }
+        
+        .watbot-price {
+            color: #0054e9;
+        }
+        
+        .leadtex-price {
+            color: #4caf50;
+        }
+        
+        /* Выравнивание заголовков и данных в столбцах одинаково */
+        .price-table th:nth-child(1),
+        .price-table td:nth-child(1) {
+            padding-left: 20px;
+        }
+        
+        .price-table th:nth-child(2),
+        .price-table td:nth-child(2) {
+            padding-right: 20px;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 24px;
+                margin-bottom: 30px;
+            }
+            
+            .platforms-container {
+                gap: 20px;
+            }
+            
+            .platform-card {
+                min-width: 100%;
+                max-width: 100%;
+            }
+            
+            .container {
+                margin: 0;
+                max-height: 85vh;
+            }
+            
+            .dialog-header, .alert {
+                padding: 15px;
+                margin: 15px;
+            }
+            
+            .price-table th, 
+            .price-table td {
+                padding: 12px 10px;
+                font-size: 13px;
+            }
+            
+            .contacts-col, .price-col {
+                width: 50%;
+            }
+            
+            .price-table th:nth-child(1),
+            .price-table td:nth-child(1) {
+                padding-left: 15px;
+            }
+            
+            .price-table th:nth-child(2),
+            .price-table td:nth-child(2) {
+                padding-right: 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .page-title {
+                font-size: 20px;
+                margin-bottom: 20px;
+            }
+            
+            .platform-card {
+                padding: 20px;
+            }
+            
+            .platform-logo {
+                font-size: 24px;
+                padding: 12px;
+            }
+            
+            .platform-name {
+                font-size: 20px;
+            }
+            
+            .show-prices-btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+            
+            .dialog-header, .alert {
+                padding: 12px;
+                margin: 10px;
+            }
+            
+            .price-table th, 
+            .price-table td {
+                padding: 10px 8px;
+                font-size: 12px;
+            }
+            
+            .price-table th:nth-child(1),
+            .price-table td:nth-child(1) {
+                padding-left: 12px;
+            }
+            
+            .price-table th:nth-child(2),
+            .price-table td:nth-child(2) {
+                padding-right: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1 class="page-title">Сравнение тарифов платформ</h1>
+    
+    <div class="platforms-container">
+        <!-- Карточка Watbot -->
+        <div class="platform-card" id="watbotCard">
+            <div class="platform-logo watbot-logo">WB</div>
+            <h2 class="platform-name">Watbot</h2>
+            <p class="platform-description">Платформа для создания чат-ботов с гибкой системой тарификации</p>
+            <button class="show-prices-btn watbot-btn" id="openWatbotBtn">Показать цены Watbot</button>
+        </div>
+        
+        <!-- Карточка LEADTEX -->
+        <div class="platform-card" id="leadtexCard">
+            <div class="platform-logo leadtex-logo">LT</div>
+            <h2 class="platform-name">LEADTEX</h2>
+            <p class="platform-description">Решение для автоматизации продаж и лидогенерации</p>
+            <button class="show-prices-btn leadtex-btn" id="openLeadtexBtn">Показать цены LEADTEX</button>
+        </div>
+    </div>
+    
+    <!-- Оверлей для диалога -->
+    <div class="dialog-overlay" id="dialogOverlay">
+        <!-- Диалог с ценами -->
+        <div class="container" id="priceDialog">
+            <!-- Заголовок диалога -->
+            <header class="dialog-header">
+                <h2 class="dialog-title" id="dialogTitle">Цены Watbot</h2>
+                <button class="close-btn" id="closeDialogBtn" aria-label="Закрыть">
+                    ✕
+                </button>
+            </header>
+            
+            <!-- Тело диалога -->
+            <div class="dialog-body">
+                <!-- Информационный блок -->
+                <div class="alert">
+                    <div class="alert-icon">ℹ</div>
+                    <div class="alert-content">
+                        <span class="alert-title">Цена зависит от количества контактов во всех ваших ботах и подключенных дополнительных опций. Удаленные контакты также считаются, но только в одном учетном периоде.</span>
+                    </div>
+                </div>
+                
+                <!-- Таблица с ценами -->
+                <table class="price-table" id="priceTable">
+                    <thead>
+                        <tr>
+                            <th class="contacts-col">Количество контактов</th>
+                            <th class="price-col">Цена в месяц</th>
+                        </tr>
+                    </thead>
+                    <tbody id="priceTableBody">
+                        <!-- Данные будут добавлены через JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Данные для цен Watbot
+        const watbotPrices = [
+            { contacts: "0 - 1 500", price: "1 100 ₽" },
+            { contacts: "1 501 - 3 000", price: "2 100 ₽" },
+            { contacts: "3 001 - 5 000", price: "3 100 ₽" },
+            { contacts: "5 001 - 10 000", price: "5 100 ₽" },
+            { contacts: "10 001 - 15 000", price: "7 900 ₽" },
+            { contacts: "15 001 - 20 000", price: "9 900 ₽" },
+            { contacts: "20 001 - 30 000", price: "12 900 ₽" },
+            { contacts: "30 001 - 40 000", price: "15 900 ₽" },
+            { contacts: "40 001 - 50 000", price: "18 900 ₽" },
+            { contacts: "50 001 - 60 000", price: "20 900 ₽" },
+            { contacts: "60 001 - 70 000", price: "21 900 ₽" },
+            { contacts: "70 001 - 80 000", price: "22 900 ₽" },
+            { contacts: "80 001 - 90 000", price: "23 900 ₽" },
+            { contacts: "90 001 - 100 000", price: "24 900 ₽" },
+            { contacts: "100 001 - 120 000", price: "25 900 ₽" },
+            { contacts: "120 001 - 140 000", price: "26 900 ₽" },
+            { contacts: "140 001 - 160 000", price: "30 000 ₽" },
+            { contacts: "160 001 - 180 000", price: "32 000 ₽" },
+            { contacts: "180 001 - 200 000", price: "35 000 ₽" },
+            { contacts: "200 001 - 300 000", price: "39 000 ₽" },
+            { contacts: "300 001 - 400 000", price: "44 000 ₽" },
+            { contacts: "400 001 - 500 000", price: "48 000 ₽" },
+            { contacts: "500 001 - 600 000", price: "52 000 ₽" },
+            { contacts: "600 001 - 700 000", price: "56 000 ₽" },
+            { contacts: "700 001 - 800 000", price: "60 000 ₽" },
+            { contacts: "800 001 - 900 000", price: "64 000 ₽" },
+            { contacts: "900 001 - 1 000 000", price: "68 000 ₽" }
+        ];
+        
+        // Данные для цен LEADTEX
+        const leadtexPrices = [
+            { contacts: "0 - 1 500", price: "1 390 ₽" },
+            { contacts: "1 501 - 3 000", price: "2 290 ₽" },
+            { contacts: "3 001 - 5 000", price: "3 390 ₽" },
+            { contacts: "5 001 - 10 000", price: "5 590 ₽" },
+            { contacts: "10 001 - 15 000", price: "7 990 ₽" },
+            { contacts: "15 001 - 20 000", price: "9 990 ₽" },
+            { contacts: "20 001 - 30 000", price: "12 990 ₽" },
+            { contacts: "30 001 - 40 000", price: "15 990 ₽" },
+            { contacts: "40 001 - 50 000", price: "18 990 ₽" },
+            { contacts: "50 001 - 60 000", price: "21 990 ₽" },
+            { contacts: "60 001 - 70 000", price: "23 990 ₽" },
+            { contacts: "70 001 - 80 000", price: "24 990 ₽" },
+            { contacts: "80 001 - 90 000", price: "25 990 ₽" },
+            { contacts: "90 001 - 100 000", price: "26 990 ₽" },
+            { contacts: "100 001 - 120 000", price: "28 990 ₽" },
+            { contacts: "120 001 - 140 000", price: "30 990 ₽" },
+            { contacts: "140 001 - 160 000", price: "32 990 ₽" },
+            { contacts: "160 001 - 180 000", price: "34 990 ₽" },
+            { contacts: "180 001 - 200 000", price: "36 990 ₽" },
+            { contacts: "200 001 - 300 000", price: "40 990 ₽" },
+            { contacts: "300 001 - 400 000", price: "44 990 ₽" },
+            { contacts: "400 001 - 500 000", price: "48 990 ₽" },
+            { contacts: "500 001 - 600 000", price: "52 990 ₽" },
+            { contacts: "600 001 - 700 000", price: "56 990 ₽" },
+            { contacts: "700 001 - 800 000", price: "60 990 ₽" },
+            { contacts: "800 001 - 900 000", price: "64 990 ₽" },
+            { contacts: "900 001 - 1 000 000", price: "68 990 ₽" }
+        ];
+        
+        // Получаем элементы
+        const openWatbotBtn = document.getElementById('openWatbotBtn');
+        const openLeadtexBtn = document.getElementById('openLeadtexBtn');
+        const closeDialogBtn = document.getElementById('closeDialogBtn');
+        const dialogOverlay = document.getElementById('dialogOverlay');
+        const priceDialog = document.getElementById('priceDialog');
+        const dialogTitle = document.getElementById('dialogTitle');
+        const priceTableBody = document.getElementById('priceTableBody');
+        const priceTable = document.getElementById('priceTable');
+        
+        // Функция для заполнения таблицы ценами
+        function fillPriceTable(prices, platform) {
+            // Очищаем таблицу
+            priceTableBody.innerHTML = '';
+            
+            // Устанавливаем цвет цен
+            const priceClass = platform === 'watbot' ? 'watbot-price' : 'leadtex-price';
+            
+            // Заполняем таблицу данными
+            prices.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.contacts}</td>
+                    <td class="${priceClass}">${item.price}</td>
+                `;
+                priceTableBody.appendChild(row);
+            });
+            
+            // Добавляем интерактивность строкам таблицы
+            document.querySelectorAll('#priceTable tbody tr').forEach(row => {
+                row.addEventListener('click', function() {
+                    // Убираем выделение у всех строк
+                    document.querySelectorAll('#priceTable tbody tr').forEach(r => {
+                        r.style.backgroundColor = '';
+                    });
+                    
+                    // Выделяем текущую строку
+                    this.style.backgroundColor = platform === 'watbot' ? '#e8f4ff' : '#e8f7e8';
+                });
+            });
+        }
+        
+        // Функция для открытия диалога
+        function openDialog(platform) {
+            if (platform === 'watbot') {
+                dialogTitle.textContent = 'Цены Watbot';
+                fillPriceTable(watbotPrices, 'watbot');
+            } else {
+                dialogTitle.textContent = 'Цены LEADTEX';
+                fillPriceTable(leadtexPrices, 'leadtex');
+            }
+            
+            dialogOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Блокируем прокрутку фона
+        }
+        
+        // Функция для закрытия диалога
+        function closeDialog() {
+            dialogOverlay.classList.remove('active');
+            document.body.style.overflow = 'auto'; // Восстанавливаем прокрутку
+            
+            // Убираем выделение со строк таблицы
+            document.querySelectorAll('#priceTable tbody tr').forEach(r => {
+                r.style.backgroundColor = '';
+            });
+        }
+        
+        // Назначаем обработчики событий
+        openWatbotBtn.addEventListener('click', () => openDialog('watbot'));
+        openLeadtexBtn.addEventListener('click', () => openDialog('leadtex'));
+        closeDialogBtn.addEventListener('click', closeDialog);
+        
+        // Закрытие диалога при клике вне его области
+        dialogOverlay.addEventListener('click', function(event) {
+            if (event.target === dialogOverlay) {
+                closeDialog();
+            }
+        });
+        
+        // Закрытие диалога по клавише Esc
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && dialogOverlay.classList.contains('active')) {
+                closeDialog();
+            }
+        });
+        
+        // Добавляем интерактивность карточкам
+        document.getElementById('watbotCard').addEventListener('click', () => openDialog('watbot'));
+        document.getElementById('leadtexCard').addEventListener('click', () => openDialog('leadtex'));
+    </script>
+</body>
+</html>
