@@ -52,6 +52,9 @@
             cursor: pointer;
             transition: transform 0.3s, box-shadow 0.3s;
             border: 1px solid #e5e7ee;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         
         .platform-card:hover {
@@ -59,36 +62,38 @@
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
         }
         
-        .platform-logo {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 15px;
+        .logo-container {
+            width: 120px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 12px;
             padding: 15px;
-            border-radius: 8px;
-            display: inline-block;
+            border: 1px solid #e5e7ee;
         }
         
-        .watbot-logo {
-            background-color: #0054e9;
-            color: white;
+        .platform-logo {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
         }
         
-        .leadtex-logo {
-            background-color: #4caf50;
-            color: white;
+        .watbot-logo-container {
+            border-color: #0054e9;
+        }
+        
+        .leadtex-logo-container {
+            border-color: #4caf50;
         }
         
         .platform-name {
             font-size: 24px;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             color: #303133;
-        }
-        
-        .platform-description {
-            color: #606266;
-            margin-bottom: 20px;
-            font-size: 14px;
         }
         
         .show-prices-btn {
@@ -102,6 +107,7 @@
             cursor: pointer;
             transition: background-color 0.2s;
             width: 100%;
+            margin-top: auto;
         }
         
         .watbot-btn {
@@ -294,6 +300,12 @@
             .platform-card {
                 min-width: 100%;
                 max-width: 100%;
+                padding: 25px;
+            }
+            
+            .logo-container {
+                width: 100px;
+                height: 100px;
             }
             
             .container {
@@ -341,9 +353,10 @@
                 padding: 20px;
             }
             
-            .platform-logo {
-                font-size: 24px;
-                padding: 12px;
+            .logo-container {
+                width: 80px;
+                height: 80px;
+                padding: 10px;
             }
             
             .platform-name {
@@ -384,17 +397,19 @@
     <div class="platforms-container">
         <!-- Карточка Watbot -->
         <div class="platform-card" id="watbotCard">
-            <div class="platform-logo watbot-logo">WB</div>
+            <div class="logo-container watbot-logo-container">
+                <img src="public/logo/watbot.png" alt="Watbot Logo" class="platform-logo" id="watbotLogo">
+            </div>
             <h2 class="platform-name">Watbot</h2>
-            <p class="platform-description">Платформа для создания чат-ботов с гибкой системой тарификации</p>
             <button class="show-prices-btn watbot-btn" id="openWatbotBtn">Показать цены Watbot</button>
         </div>
         
         <!-- Карточка LEADTEX -->
         <div class="platform-card" id="leadtexCard">
-            <div class="platform-logo leadtex-logo">LT</div>
+            <div class="logo-container leadtex-logo-container">
+                <img src="public/logo/leadtex.png" alt="LEADTEX Logo" class="platform-logo" id="leadtexLogo">
+            </div>
             <h2 class="platform-name">LEADTEX</h2>
-            <p class="platform-description">Решение для автоматизации продаж и лидогенерации</p>
             <button class="show-prices-btn leadtex-btn" id="openLeadtexBtn">Показать цены LEADTEX</button>
         </div>
     </div>
@@ -509,6 +524,21 @@
         const dialogTitle = document.getElementById('dialogTitle');
         const priceTableBody = document.getElementById('priceTableBody');
         const priceTable = document.getElementById('priceTable');
+        const watbotLogo = document.getElementById('watbotLogo');
+        const leadtexLogo = document.getElementById('leadtexLogo');
+        
+        // Обработка ошибок загрузки изображений
+        watbotLogo.onerror = function() {
+            console.warn('Логотип Watbot не найден по пути: public/logo/watbot.png');
+            this.style.display = 'none';
+            this.parentElement.innerHTML = '<div style="color: #0054e9; font-size: 32px; font-weight: bold;">WB</div>';
+        };
+        
+        leadtexLogo.onerror = function() {
+            console.warn('Логотип LEADTEX не найден по пути: public/logo/leadtex.png');
+            this.style.display = 'none';
+            this.parentElement.innerHTML = '<div style="color: #4caf50; font-size: 32px; font-weight: bold;">LT</div>';
+        };
         
         // Функция для заполнения таблицы ценами
         function fillPriceTable(prices, platform) {
